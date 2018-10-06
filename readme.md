@@ -45,11 +45,11 @@ The npm start command starts the Expo CLI server. You can now run the project on
 - Press 'e' in the terminal to send the app link to your email address or phone number. This link can be used to run your project from the Expo app.
 - Alternatively you can press 's' in the terminal and sign in with an Expo account, and sign in with the same account in the Expo app: your projects will automatically appear in the "Projects" tab.
 
-For more informations about Expo visit [Expo Documentation](https://docs.expo.io/versions/latest/)
+For more information about Expo visit [Expo Documentation](https://docs.expo.io/versions/latest/)
 
 ## Contributing
 
-Student / developers, feel free to contribute to this projet. 
+Student / developers, feel free to contribute to this project. 
 
 ## Authors
 
