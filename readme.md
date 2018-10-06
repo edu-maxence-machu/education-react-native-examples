@@ -2,12 +2,12 @@
 
 Code examples for React-Native
 
-##Projects availables: 
+## Projects in this repository : 
 
 ##### Yoki
 Yoki is a  [Yuka](https://yuka.io/) like react-native app
 
-For more information : [yoki-readme.md](Yoki-BarCodeScanner/readme.md)
+For more information : [yoki-readme.md](Yoki/readme.md)
 
 ## Getting Started
 

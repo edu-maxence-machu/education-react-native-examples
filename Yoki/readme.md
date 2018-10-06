@@ -1,16 +1,18 @@
 # Yoki project
 
 Yoki is a  [Yuka](https://yuka.io/) like react-native app
+
 Scan a product in your kitchen and see the informations and data on your food products.
+
 Yoki is based on data collected from [openfoodfacts](https://world.openfoodfacts.org/)
 
-The objectives of this project is to 
+The objectives of this project are: 
 * Use the camera and native permissions
 * Scan products and call API
 * Use of the AsyncStorage
 * Use of components and imports
 
-##Features: 
+## Features: 
 
 * ...
 
