@@ -1,0 +1,5 @@
+Yoki/node_modules/**/*
+Yoki/.expo/*
+Yoki/npm-debug.*
+.idea/*
+Yoki/.idea/*
