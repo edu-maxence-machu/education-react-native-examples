@@ -1,12 +1,7 @@
-import React from 'react'
-import Home from './views/Home'
+import React from "react";
+import Home from "./views/Home";
 
-export default class App extends React.Component {
-
-  constructor () {
-    super()
-  }
-
+export default function App() {
   /*
    * Files :
    *  - components/*
@@ -22,10 +17,5 @@ export default class App extends React.Component {
    * Feel free to move App logic from Home.js here
    * @returns {*}
    */
-  render () {
-    return (
-      <Home/>
-    )
-  }
+  return <Home />;
 }
-

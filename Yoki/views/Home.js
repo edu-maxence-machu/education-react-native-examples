@@ -1,97 +1,85 @@
-import React from 'react'
+import React, { useEffect } from "react";
 import {
-  AsyncStorage, FlatList, StyleSheet, Text, TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
   View,
-} from 'react-native'
-import BarCodeModal from '../modals/BarCodeModal'
-import ProductModal from '../modals/ProductModal'
-import Header from '../components/Header'
-import Button from '../components/Button'
-import { globalStyle, globalTextStyle } from '../styles/global'
-import { getColorFromScore } from '../functions/product'
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default class Home extends React.Component {
+import BarCodeModal from "../modals/BarCodeModal";
+import ProductModal from "../modals/ProductModal";
+import Header from "../components/Header";
+import Button from "../components/Button";
+import { globalStyle, globalTextStyle } from "../styles/global";
+import { getColorFromScore } from "../functions/product";
 
-  constructor(){
-    super();
-
-    /*
-    Initial state
-    Modals are closed and data empty
-    History is loaded from {componentDidMount}
-     */
-    this.state = {
-      modalScannerVisible: false,
-      modalProductVisible: false,
-      barCodeData: {},
-      productData: {},
-      history: [],
-      loading: false,
-    };
-  };
+export default function Home() {
+  const [modalScannerVisible, setModalScannerVisible] = React.useState(false);
+  const [modalProductVisible, setModalProductVisible] = React.useState(false);
+  const [barCodeData, setBarCodeData] = React.useState({});
+  const [productData, setProductData] = React.useState({});
+  const [history, setHistory] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
 
   /**
-   * ComponentDidMount can be async
+   * useEffect can be async
    * Why here ? Because we wait to get the product history from AsyncStorage
    * @returns {Promise<void>}
    */
-  componentDidMount = async () => {
-    try {
-      const history = await AsyncStorage.getItem('PDT_HISTORY');
 
+  useEffect(() => {
+    async () => {
+      const history = await AsyncStorage.getItem("history");
+      setHistory(JSON.parse(history) || []);
+    };
+    /*
+    async function getHistory() {
+      const history = await AsyncStorage.getItem("PDT_HISTORY");
       if (history !== null) {
-        this.setState({history: JSON.parse(history)})
+        setHistory(JSON.parse(history));
       } else {
-        await AsyncStorage.setItem('PDT_HISTORY', JSON.stringify(this.state.history));
+        await AsyncStorage.setItem("PDT_HISTORY", JSON.stringify(history));
       }
-    } catch (error)  {
-      console.error(error);
     }
-  }
 
-  /**
-   * <ProductModal/> & <BarCodeModal/> react to modal...Visible state
-   * If state = true the modal opens
-   * If state = false the modal closes
-   * @param {boolean} visible
-   */
-  setModalScannerVisible(visible) {
-    this.setState({modalScannerVisible: visible});
-  }
-  setModalProductVisible(visible) {
-    this.setState({modalProductVisible: visible});
-  }
+    try {
+      getHistory();
+    } catch (e) {
+      console.error(e);
+    }*/
+  });
 
   /**
    * Passed as prop to <BarCodeModal/>
    * Calls the OpenFoodFact API
    * Parameters are retrieved from Expo BarCodeScan component
-   * @param type - Type of the scanned BarCode
+   * @param type - Type of the sclanned BarCode
    * @param data - Data of the scanned BarCode
    * @returns {Promise<void>}
    * @private
    */
-  async _handleBarCodeRead ({ type, data }) {
-    this.setState({barCodeData: data});
-    this.setModalScannerVisible(false);
+  async function _handleBarCodeRead({ type, data }) {
+    setBarCodeData(data);
+    setModalScannerVisible(false);
 
     // this function is async
-    await this.getProductInfoFromApi(data);
-  };
+    await getProductInfoFromApi(data);
+  }
 
-  getProductInfoFromApi = async (barCode) => {
+  async function getProductInfoFromApi(barCode) {
     try {
-      this.setState({loading : true});
+      setLoading(true);
 
       let response = await fetch(
-        'https://fr.openfoodfacts.org/api/v0/produit/' + barCode + '.json'
+        "https://fr.openfoodfacts.org/api/v0/produit/" + barCode + ".json"
       );
       let responseJson = await response.json();
 
-      this.setStateAndOpenModal(responseJson.product);
-      this.setState({loading : false});
-      this.setModalProductVisible(true);
-
+      setStateAndOpenModal(responseJson.product);
+      setLoading(false);
+      setModalProductVisible(true);
     } catch (error) {
       console.error(error);
     }
@@ -103,28 +91,28 @@ export default class Home extends React.Component {
    * @param data
    */
   setStateAndOpenModal = (data) => {
-    this.setState({productData: data});
-    this.setModalProductVisible(true);
-  }
+    setProductData(data);
+    setModalProductVisible(true);
+  };
 
   /**
    * Set as props of <ProductModal/>
    * Called when user ask to save to product
    * @returns {Promise<void>}
    */
-  saveProductAndQuitModal = async () => {
-    this.setModalProductVisible(false);
-    this.setState({loading : true});
+  async function saveProductAndQuitModal() {
+    setModalProductVisible(false);
+    setLoading(true);
 
-    let history = this.state.history;
-    history.push(this.state.productData);
-    this.setState({history: history})
+    let _history = history;
+    _history.push(productData);
+    setHistory(_history);
 
     try {
-        await AsyncStorage.setItem('PDT_HISTORY', JSON.stringify(history));
-        this.setState({loading : false});
-    } catch (error)  {
-        console.error(error);
+      await AsyncStorage.setItem("PDT_HISTORY", JSON.stringify(history));
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -136,28 +124,33 @@ export default class Home extends React.Component {
   renderItemHistory = (el) => {
     return (
       <TouchableOpacity
-        onPress={() => this.setStateAndOpenModal(el)}
-        style={globalStyle.itemLine}>
-        <Text style={[globalTextStyle.h2,
-          {color: getColorFromScore(el.nutrition_grades)}]}>
+        onPress={() => setStateAndOpenModal(el)}
+        style={globalStyle.itemLine}
+      >
+        <Text
+          style={[
+            globalTextStyle.h2,
+            { color: getColorFromScore(el.nutrition_grades) },
+          ]}
+        >
           {el.product_name}
-          </Text>
+        </Text>
 
-        <Text style={[globalTextStyle.subtitle, {marginBottom: 0}]}>
+        <Text style={[globalTextStyle.subtitle, { marginBottom: 0 }]}>
           {el.brands}
         </Text>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   /**
    * Clean AsyncStorage products history
    * And reset the state (history array)
    */
   resetCache = () => {
-    AsyncStorage.removeItem('PDT_HISTORY');
-    this.setState({history: []})
-  }
+    AsyncStorage.removeItem("PDT_HISTORY");
+    setHistory([]);
+  };
 
   /**
    * Each item of a flatlist must have a key
@@ -169,99 +162,105 @@ export default class Home extends React.Component {
    */
   _keyExtractor = (item, index) => index.toString();
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <View style={globalStyle.statusBar} />
+  return (
+    <View style={styles.container}>
+      <View style={globalStyle.statusBar} />
 
-        <Header text={'Yoki'}/>
+      <Header text={"Yoki"} />
 
-
-        {this.state.loading === true && <View style={styles.loading}>
+      {loading === true && (
+        <View style={styles.loading}>
           <Text style={styles.loadingText}>Loading...</Text>
-        </View>}
+        </View>
+      )}
 
-        <View style={[{flex: 1, padding: 10}]}>
+      <View style={[{ flex: 1, padding: 10 }]}>
+        <BarCodeModal
+          modalVisible={modalScannerVisible}
+          setModalVisible={(visible) => setModalScannerVisible(visible)}
+          handleBarCodeScanned={({ type, data }) =>
+            _handleBarCodeRead({ type, data })
+          }
+        />
 
-          <BarCodeModal modalVisible={this.state.modalScannerVisible}
-                        setModalVisible={(visible) => this.setModalScannerVisible(visible)}
-                        handleBarCodeScanned={({type, data}) =>
-                          this._handleBarCodeRead({type, data})}
+        <ProductModal
+          modalVisible={modalProductVisible}
+          setModalVisible={(visible) => setModalProductVisible(visible)}
+          productData={productData}
+          saveAndQuit={saveProductAndQuitModal}
+        />
+
+        <Button
+          onPress={() => {
+            setModalScannerVisible(true);
+          }}
+          text="Scan a product"
+        />
+
+        <View style={styles.history}>
+          <Text style={globalTextStyle.h1}>Previous Scans</Text>
+
+          <FlatList
+            contentContainerStyle={styles.scrollView}
+            style={{ flex: 1 }}
+            data={history}
+            renderItem={({ item }) => renderItemHistory(item)}
+            keyExtractor={_keyExtractor}
           />
 
-          <ProductModal modalVisible={this.state.modalProductVisible}
-                        setModalVisible={(visible) => this.setModalProductVisible(visible)}
-                        productData={this.state.productData}
-                        saveAndQuit={this.saveProductAndQuitModal}
-          />
-
-          <Button
-            onPress={() => {this.setModalScannerVisible(true)}}
-            text="Scan a product"
-          />
-
-          <View style={styles.history}>
-            <Text style={globalTextStyle.h1}>Previous Scans</Text>
-
-            <FlatList contentContainerStyle={styles.scrollView}
-                      style={{flex: 1}}
-                      data={this.state.history}
-                      renderItem={({item}) => this.renderItemHistory(item)}
-                      keyExtractor={this._keyExtractor}
-            />
-
-            <TouchableOpacity onPress={this.resetCache}>
-              <Text style={globalTextStyle.lightbutton}>Reset previous scans</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={resetCache}>
+            <Text style={globalTextStyle.lightbutton}>
+              Reset previous scans
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
-    );
-  }
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f6f6f6',
-    flexDirection: 'column',
-    flexWrap: 'wrap',
+    backgroundColor: "#f6f6f6",
+    flexDirection: "column",
+    flexWrap: "wrap",
   },
   text: {
-    color: 'black',
-    fontSize: 18
+    color: "black",
+    fontSize: 18,
   },
   loading: {
-    position: 'absolute',
+    position: "absolute",
     width: 100,
-    top: '50%' - 50,
-    left: '50%' - 50,
+    top: "50%",
+    left: "50%",
     height: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    zIndex: 10
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    zIndex: 10,
   },
   loadingText: {
     ...globalTextStyle.h1,
-    color: 'white'
+    color: "white",
   },
-  halfView : {
-    height: '50%',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  halfView: {
+    height: "50%",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  history : {
+  history: {
     flex: 1,
     marginTop: 20,
   },
-  scrollView : {
+  scrollView: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: 'grey',
-    borderRadius: 10
+    borderColor: "grey",
+    borderRadius: 10,
   },
 });

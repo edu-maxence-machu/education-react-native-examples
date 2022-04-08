@@ -1,14 +1,7 @@
 {
   "expo": {
-    "name": "Yoki-BarCodeScanner",
-    "description": "This project is really great.",
-    "slug": "Yoki-BarCodeScanner",
-    "privacy": "public",
-    "sdkVersion": "30.0.0",
-    "platforms": [
-      "ios",
-      "android"
-    ],
+    "name": "Yoki2022",
+    "slug": "Yoki2022",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,11 +17,16 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.maxencemachu.yoki"
+      "supportsTablet": true
     },
     "android": {
-      "package": "com.maxencemachu.yoki"
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     }
   }
 }
